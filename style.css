@@ -1,0 +1,11 @@
+.gridsquare {
+	border: 1px solid black;
+	float: left;
+	display: block;
+	width: 15px;
+	height: 15px;
+}
+
+.gridrow {
+  clear: left;
+}
