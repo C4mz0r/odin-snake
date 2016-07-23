@@ -22,7 +22,8 @@ function Game() {
 	}	
 	
 	this.updateView = function(grid) {
-		$("#content").empty();
+		$("#score").val(this.snake.body.length);
+		$("#content").empty();		
 		for(var row = 0; row < grid.length; row++) {
 			$("#content").append("<div class='gridrow'></div>");
 			for( var i = 0; i < grid.length; i++) {
@@ -82,7 +83,7 @@ function Game() {
 	self.start = function() {
 		self.gameIntervalId = setInterval(function(){
 		  self.action();	
-		}, 1000);
+		}, 500);
 		
 		self.foodIntervalId = setInterval(function(){
 			self.food.addFood(self.gridArea.grid);
@@ -104,7 +105,7 @@ function Game() {
 
 function Snake() {
 	this.head = [10,10];
-	this.body = [[10,11],[10,12]];
+	this.body = [];
 	// The last known place that his tail touched from the latest move.  (Not the current tail.)
 	// Used for growing
 	this.lastKnownLocation = undefined;
@@ -142,9 +143,14 @@ function Snake() {
 			break;			
 		}		
 	
-		this.lastKnownLocation = this.body.pop();		
-		this.body.unshift(oldHeadLocation);
-		newHead = [this.head[0], this.head[1]]
+		if (this.body.length > 0) {
+			this.lastKnownLocation = this.body.pop();				
+			this.body.unshift(oldHeadLocation);
+		}
+		else {
+			this.lastKnownLocation = oldHeadLocation;
+		}
+		newHead = [this.head[0], this.head[1]];
 		this.head = newHead;		
 	}
 	
@@ -193,7 +199,7 @@ function Snake() {
 	 */
 	this.grow = function() {
 		if (this.lastKnownLocation) {
-			this.body.push(this.lastKnownLocation)
+			this.body.push(this.lastKnownLocation);
 		}
 	}
 }
@@ -244,10 +250,19 @@ function Food() {
 
 
 $(function(){
+	var g;
 	
 	$("#newGame").click(function(){
-		var g = new Game();	
+		g = new Game();	
 		g.start();
+		$(this).prop("disabled", true);
+	});
+	
+	$("#reset").click(function(){
+		$("#newGame").prop("disabled", false);
+		if (typeof g !== 'undefined') {
+			g.stop();
+		}				
 	});
 		
 });
