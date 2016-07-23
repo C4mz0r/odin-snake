@@ -34,10 +34,13 @@ function Game() {
 	this.move = function() {
 		this.snake.move();
 		if (this.snake.isEating(this.food) ) {		
-			console.log(" *****  GULP *****");
 			this.snake.grow();
 		}
-		console.log("Hello from move");
+		
+		if (this.snake.isDead(this.gridArea.grid.length)) {
+			alert("Game over!  The snake bit the dust.");
+			this.stop();
+		}			
 	}
 	
 	
@@ -152,6 +155,28 @@ function Snakey() {
 		this.body.unshift(oldHeadLocation);
 		newHead = [this.head[0], this.head[1]]
 		this.head = newHead;		
+	}
+	
+	/*
+	 * Return true if the snake is dead, false otherwise.
+	 * The snake dies if he goes out of bounds or his head runs into his body.
+	 */
+	this.isDead = function(dimension) {				
+		if ( this.head[0] < 0 || this.head[0] >= dimension )
+			return true;
+		
+		if ( this.head[1] < 0 || this.head[1] >= dimension )
+			return true;
+		
+		var dead = false;
+		for(var i = 0; i<this.body.length; i++) {
+			if ( this.head[0] == this.body[i][0] &&
+				 this.head[1] == this.body[i][1] ) {
+				dead = true;					 
+				break;
+			}
+		}
+		return dead;
 	}
 	
 	/*	 
