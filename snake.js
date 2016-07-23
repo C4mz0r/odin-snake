@@ -57,7 +57,7 @@ function Game() {
 				
 				contentClass = "'" + contentClass + "'";
 				
-				$(".gridrow:last").append("<div class="+ contentClass +">" + grid[row][i] + "</div>")
+				$(".gridrow:last").append("<div class="+ contentClass +"></div>")
 			}		
 		}
 	}
