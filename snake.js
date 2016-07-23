@@ -9,7 +9,7 @@ DirectionsEnum = {
 }
 
 function Game() { 
-	this.snake = new Snakey();
+	this.snake = new Snake();
 	this.gridArea = new GridArea(15);
 	this.food = new Food();
 		
@@ -42,8 +42,7 @@ function Game() {
 			this.stop();
 		}			
 	}
-	
-	
+		
 	this.action = function() {
 		this.move();
 		this.render();		
@@ -93,18 +92,17 @@ function Game() {
 	// Stop the game by stopping the setIntervals.
 	self.stop = function() {
 		clearInterval(this.gameIntervalId);
-		clearInterval(this.foodIntervalId);
+		clearInterval(this.foodIntervalId);		
 	}
 	
-	this.printIntervals = function(){ 
+	this.getIntervals = function(){ 
 		console.log("game interval is " + this.gameIntervalId);
 		console.log("food interval is " + this.foodIntervalId);
-	}
-	
-	
+		return {game: this.gameIntervalId, food: this.foodIntervalId};
+	}		
 }
 
-function Snakey() {
+function Snake() {
 	this.head = [10,10];
 	this.body = [[10,11],[10,12]];
 	// The last known place that his tail touched from the latest move.  (Not the current tail.)
@@ -119,9 +117,7 @@ function Snakey() {
 		// Draw snake's body on the grid
 		for(var i=0; i< this.body.length; i++) {
 			grid[ this.body[i][0] ][ this.body[i][1] ] = 'x';
-		}
-		
-		console.log("rendered snake");		
+		}					
 	}
 	
 	/*
@@ -131,25 +127,20 @@ function Snakey() {
 	 */
 	this.move = function() {		
 		var oldHeadLocation = [ this.head[0], this.head[1] ];					
-
-		var dir = this.direction;
-			
-		if (dir == DirectionsEnum.UP) {	
-			console.log("moving up");		
-	  		this.head[0] -= 1;
-	    }
-		else if (dir == DirectionsEnum.DOWN) {
-			console.log("moving down");
-	  		this.head[0] += 1;
-		}
-		else if (dir == DirectionsEnum.LEFT) {
-			console.log("moving left");
-	  		this.head[1] -= 1;
-	    }
-		else if (dir == DirectionsEnum.RIGHT) {
-			console.log("moving right");
-			this.head[1] += 1;
-		}	
+		switch(this.direction) {
+			case DirectionsEnum.UP:
+				this.head[0] -= 1;
+			break;
+			case DirectionsEnum.DOWN:
+				this.head[0] += 1;
+			break;
+			case DirectionsEnum.LEFT:
+				this.head[1] -= 1;
+			break;
+			case DirectionsEnum.RIGHT:
+				this.head[1] += 1
+			break;			
+		}		
 	
 		this.lastKnownLocation = this.body.pop();		
 		this.body.unshift(oldHeadLocation);
@@ -243,22 +234,20 @@ function Food() {
 		}
 	}
 	
-	this.render = function(grid) {	  
-			  
-		// Draw food on the grid
+	this.render = function(grid) {	  			  		
 		for(var i=0; i< this.foodLocations.length; i++) {
 			grid[ this.foodLocations[i][0] ][ this.foodLocations[i][1] ] = 'f';
-		}
-		
-		console.log("rendered food");		
+		}	
 	}
 }
 
 
 
 $(function(){
-	g = new Game();
-	g.start();
-	g.printIntervals();
+	
+	$("#newGame").click(function(){
+		var g = new Game();	
+		g.start();
+	});
 		
 });
