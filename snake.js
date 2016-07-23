@@ -38,6 +38,7 @@ function Game() {
 		for(var row = 0; row < grid.length; row++) {
 			$("#content").append("<div class='gridrow'></div>");
 			for( var i = 0; i < grid.length; i++) {
+				
 				var contentClass = "gridsquare";
 				
 				switch (grid[row][i]) {
@@ -84,8 +85,7 @@ function Game() {
 	}
 	
 	this.setKeyListener = function(self) {
-		$(document).keypress(function(event) {
-			console.log("DETECTING KEY CODE " + event.keyCode);			
+		$(document).keypress(function(event) {					
 			switch(event.keyCode) {
 				case DirectionsEnum.LEFT:
 				case DirectionsEnum.UP:
