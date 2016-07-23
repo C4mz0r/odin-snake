@@ -8,6 +8,16 @@ DirectionsEnum = {
 	DOWN: 40
 }
 
+/*
+ * Grid Contents
+ */
+ContentsEnum = {
+	SNAKEHEAD: '0',
+	SNAKEBODY: 'x',
+	FOOD: 'f',
+	EMPTY: ' '
+}
+
 function Game() { 
 	this.snake = new Snake();
 	this.gridArea = new GridArea(15);
@@ -23,11 +33,31 @@ function Game() {
 	
 	this.updateView = function(grid) {
 		$("#score").val(this.snake.body.length);
-		$("#content").empty();		
+		$("#content").empty();
+				
 		for(var row = 0; row < grid.length; row++) {
 			$("#content").append("<div class='gridrow'></div>");
 			for( var i = 0; i < grid.length; i++) {
-				$(".gridrow:last").append("<div class='gridsquare'>" + grid[row][i] + "</div>")
+				var contentClass = "gridsquare";
+				
+				switch (grid[row][i]) {
+				  case ContentsEnum.SNAKEHEAD:
+				    contentClass += " snakehead"; 
+				  break;
+				  case ContentsEnum.SNAKEBODY:
+				  	contentClass += " snakebody";
+				  break;
+				  case ContentsEnum.FOOD:
+				  	contentClass += " food";
+				  break;
+				  case ContentsEnum.EMPTY:
+				    contentClass += "";
+				  break;
+				}
+				
+				contentClass = "'" + contentClass + "'";
+				
+				$(".gridrow:last").append("<div class="+ contentClass +">" + grid[row][i] + "</div>")
 			}		
 		}
 	}
@@ -113,11 +143,11 @@ function Snake() {
 	
 	this.render = function(grid) {	  
 		// Draw snake's head on the grid
-		grid[this.head[0]][this.head[1]] = '0';
+		grid[this.head[0]][this.head[1]] = ContentsEnum.SNAKEHEAD;
 	  
 		// Draw snake's body on the grid
 		for(var i=0; i< this.body.length; i++) {
-			grid[ this.body[i][0] ][ this.body[i][1] ] = 'x';
+			grid[ this.body[i][0] ][ this.body[i][1] ] = ContentsEnum.SNAKEBODY;
 		}					
 	}
 	
@@ -213,7 +243,7 @@ function GridArea(dimension) {
 		for(var k = 0; k < dimension; k++) {	
 			grid_row = [];	
 			for(var i = 0; i < dimension; i++) {
-				grid_row.push(" ")
+				grid_row.push(ContentsEnum.EMPTY)
 			}		
 			grid[k] = grid_row;
 		}	    
@@ -227,8 +257,6 @@ function Food() {
 	this.foodLocations = [[5,5]];
 	
 	this.addFood = function(grid) {
-		console.log("Adding food!");
-		console.log(""+grid);
 		var placedFood = false;
 		while (!placedFood){
 			var x = Math.floor(Math.random() * grid.length);
@@ -242,7 +270,7 @@ function Food() {
 	
 	this.render = function(grid) {	  			  		
 		for(var i=0; i< this.foodLocations.length; i++) {
-			grid[ this.foodLocations[i][0] ][ this.foodLocations[i][1] ] = 'f';
+			grid[ this.foodLocations[i][0] ][ this.foodLocations[i][1] ] = ContentsEnum.FOOD;
 		}	
 	}
 }

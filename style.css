@@ -6,6 +6,18 @@
 	height: 15px;
 }
 
+.snakehead {
+	background-color: green;
+}
+
+.snakebody {
+	background-color: green;
+}
+
+.food {
+	background-color: yellow;
+}
+
 .gridrow {
   clear: left;
 }
