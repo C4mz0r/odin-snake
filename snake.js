@@ -33,6 +33,10 @@ function Game() {
 	
 	this.move = function() {
 		this.snake.move();
+		if (this.snake.isEating(this.food) ) {		
+			console.log(" *****  GULP *****");
+			this.snake.grow();
+		}
 		console.log("Hello from move");
 	}
 	
@@ -68,17 +72,41 @@ function Game() {
 	var self = this;
 	this.setKeyListener(self);
 	
-	// Use the self for setInterval as well
+	// Stores the id for the intervals
+	this.gameIntervalId = undefined;
+	this.foodIntervalId = undefined;
+	
+	// Start the intervals for the game move/draw and adding food.
 	self.start = function() {
-		self.interval = setInterval(function(){
+		self.gameIntervalId = setInterval(function(){
 		  self.action();	
 		}, 1000);
-	}	
+		
+		self.foodIntervalId = setInterval(function(){
+			self.food.addFood(self.gridArea.grid);
+		}, 5000);
+	}
+	
+	// Stop the game by stopping the setIntervals.
+	self.stop = function() {
+		clearInterval(this.gameIntervalId);
+		clearInterval(this.foodIntervalId);
+	}
+	
+	this.printIntervals = function(){ 
+		console.log("game interval is " + this.gameIntervalId);
+		console.log("food interval is " + this.foodIntervalId);
+	}
+	
+	
 }
 
 function Snakey() {
 	this.head = [10,10];
 	this.body = [[10,11],[10,12]];
+	// The last known place that his tail touched from the latest move.  (Not the current tail.)
+	// Used for growing
+	this.lastKnownLocation = undefined;
 	this.direction = DirectionsEnum.LEFT; //= new Direction();
 	
 	this.render = function(grid) {	  
@@ -90,19 +118,19 @@ function Snakey() {
 			grid[ this.body[i][0] ][ this.body[i][1] ] = 'x';
 		}
 		
-		console.log("rendered snake");
-		console.log(""+grid);
+		console.log("rendered snake");		
 	}
 	
-	this.move = function() {
-		
-		console.log("Snake move!");
-		console.log("before move snake is [" + this.head + "]" + this.body);
-		
-		var oldHeadLocation = [ this.head[0], this.head[1] ];			
-		
-		var dir = this.direction;//.direction;		
-		console.log("**** in snake move, direc is " + dir);	
+	/*
+	 * Move the snake forward in the specified direction
+	 * Note:  Keep track of the last known position of his
+	 * tail, in case he needs to grow.
+	 */
+	this.move = function() {		
+		var oldHeadLocation = [ this.head[0], this.head[1] ];					
+
+		var dir = this.direction;
+			
 		if (dir == DirectionsEnum.UP) {	
 			console.log("moving up");		
 	  		this.head[0] -= 1;
@@ -119,14 +147,38 @@ function Snakey() {
 			console.log("moving right");
 			this.head[1] += 1;
 		}	
-			
-		// Move the body forward		
-		this.body.pop();		
+	
+		this.lastKnownLocation = this.body.pop();		
 		this.body.unshift(oldHeadLocation);
 		newHead = [this.head[0], this.head[1]]
-		this.head = newHead;
-		 		
-		//console.log("after move snake is [" + this.head + "]" + this.body);
+		this.head = newHead;		
+	}
+	
+	/*	 
+	 * Returns true if snake's head is overlapping food,
+	 * false otherwise.
+	 * Modifies the food object (removes food item if the snake ate it)
+	 */
+	this.isEating = function(food) {		
+		var eating = false;
+		for(var i = 0; i<food.foodLocations.length; i++) {
+			if ( this.head[0] == food.foodLocations[i][0] &&
+					this.head[1] == food.foodLocations[i][1] ) {
+					 eating = true;
+					 food.foodLocations.splice(i, 1);
+					 break;
+			}
+		}
+		return eating;			
+	}
+	
+	/*
+	 * Grow the snake by adding a piece to his tail in the empty position that it was just located
+	 */
+	this.grow = function() {
+		if (this.lastKnownLocation) {
+			this.body.push(this.lastKnownLocation)
+		}
 	}
 }
 
@@ -150,16 +202,30 @@ function GridArea(dimension) {
 }
 
 function Food() {
-	this.food = [[5,5]];
+	this.foodLocations = [[5,5]];
+	
+	this.addFood = function(grid) {
+		console.log("Adding food!");
+		console.log(""+grid);
+		var placedFood = false;
+		while (!placedFood){
+			var x = Math.floor(Math.random() * grid.length);
+			var y = Math.floor(Math.random() * grid.length);		
+			if (grid[x][y] === " ") {
+				this.foodLocations.push([x,y]);
+				placedFood = true;
+			}
+		}
+	}
+	
 	this.render = function(grid) {	  
 			  
 		// Draw food on the grid
-		for(var i=0; i< this.food.length; i++) {
-			grid[ this.food[i][0] ][ this.food[i][1] ] = 'f';
+		for(var i=0; i< this.foodLocations.length; i++) {
+			grid[ this.foodLocations[i][0] ][ this.foodLocations[i][1] ] = 'f';
 		}
 		
-		console.log("rendered food");
-		console.log(""+grid);
+		console.log("rendered food");		
 	}
 }
 
@@ -167,5 +233,7 @@ function Food() {
 
 $(function(){
 	g = new Game();
-	g.start();	
+	g.start();
+	g.printIntervals();
+		
 });
